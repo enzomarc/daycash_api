@@ -14,6 +14,9 @@
 use Illuminate\Support\Facades\Route;
 
 
+Route::post('login', 'UserController@login');
+Route::get('logout/{token}', 'UserController@logout');
+
 Route::get('users', 'UserController@index');
 Route::get('users/{user}', 'UserController@show');
 Route::post('users', 'UserController@store');

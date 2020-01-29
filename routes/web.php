@@ -11,6 +11,12 @@
 |
 */
 
-$router->get('/', function () use ($router) {
-    return $router->app->version();
-});
+use Illuminate\Support\Facades\Route;
+
+
+Route::get('users', 'UserController@index');
+Route::get('users/{user}', 'UserController@show');
+Route::post('users', 'UserController@store');
+Route::put('users/{user}', 'UserController@update');
+Route::delete('users/{user}', 'UserController@destroy');
+Route::get('users/{user}/exists', 'UserController@exists');

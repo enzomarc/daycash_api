@@ -18,7 +18,7 @@ class User extends Model implements AuthenticatableContract, AuthorizableContrac
      * @var array
      */
     protected $fillable = [
-        'name', 'email',
+        'name', 'phone', 'password', 'points', 'active'
     ];
 
     /**
@@ -28,5 +28,14 @@ class User extends Model implements AuthenticatableContract, AuthorizableContrac
      */
     protected $hidden = [
         'password',
+    ];
+	
+	/**
+	 * The casted attributes.
+	 *
+	 * @var array
+	 */
+    protected $casts = [
+    	'active' => 'boolean'
     ];
 }

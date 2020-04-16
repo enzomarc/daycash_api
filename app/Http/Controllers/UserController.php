@@ -117,61 +117,14 @@ class UserController extends Controller
 		try  {
 			$user = User::findOrFail($user);
 			$user->update(['active' => 0]);
-			// Delete or deactivate user account. Delete related.
-			
+			// Delete or deactivate user account. Also delete related.
+
 			return response()->json(['message' => "Votre compte a été supprimé avec succès."]);
 		} catch (\Exception $e) {
 			return response()->json(['message' => "Une erreur est survenue lors de la suppression de votre compte.", 'exception' => $e->getMessage()], 500);
 		}
 	}
-	
-	/**
-	 * Login user with given credentials.
-	 *
-	 * @param Request $request
-	 * @return \Illuminate\Http\JsonResponse
-	 */
-	public function login(Request $request)
-	{
-		try {
-			$credentials = $request->input(['phone', 'password']);
-			$user = User::all()->where('phone', $credentials['phone']);
-			
-			if (Hash::check($credentials['password'], $user->password)) {
-				if ($user->active) {
-					$token = Crypt::encryptString($user->phone . Str::random(8));
-					DB::table('connections')->insert(['phone' => $user->phone, 'token' => $token]);
-					
-					return response()->json(['message' => "Bienvenue sur Le Jour Qui Gagne. Tentez votre chance, c'est peut-être votre jour.", 'user' => $user, 'token' => $token]);
-				}
-				else
-					return response()->json(['message' => "Votre compte est désactivé ou a été supprimé. Rendez-vous dans la section Aide pour plus d'informations."], 401);
-			}
-			else
-				return response()->json(['message' => "Numéro de téléphone ou mot de passe incorrect."], 401);
-		} catch (\Exception $e) {
-			return response()->json(['message' => "Une erreur est survenue lors de la connexion.", 'exception' => $e->getMessage()], 500);
-		}
-	}
-	
-	/**
-	 * Close the session with the given token.
-	 *
-	 * @param string $token
-	 * @return \Illuminate\Http\JsonResponse
-	 */
-	public function logout(string $token)
-	{
-		try {
-			$connection = DB::table('connections')->where('token', $token)->first();
-			$connection->delete();
-			
-			return response()->json(['message' => "Your session was closed successfully."]);
-		} catch (\Exception $e) {
-			return response()->json(['message' => "An error occurred during session deletion.", 'exception' => $e->getMessage()], 500);
-		}
-	}
-	
+
 	/**
 	 * Determine if user with given phone exists.
 	 *

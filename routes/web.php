@@ -14,12 +14,26 @@
 use Illuminate\Support\Facades\Route;
 
 
-Route::post('login', 'UserController@login');
-Route::get('logout/{token}', 'UserController@logout');
-
-Route::get('users', 'UserController@index');
-Route::get('users/{user}', 'UserController@show');
-Route::post('users', 'UserController@store');
-Route::put('users/{user}', 'UserController@update');
-Route::delete('users/{user}', 'UserController@destroy');
-Route::get('users/{user}/exists', 'UserController@exists');
+Route::group(['prefix' => 'api'], function () {
+	Route::get('/', function () {
+		return "DayCash API v1.0.0";
+	});
+	
+	Route::post('login', 'AuthController@login');
+	Route::get('logout/{token}', 'AuthController@logout');
+	Route::get('check', 'AuthController@check');
+	
+	Route::get('users', 'UserController@index');
+	Route::get('users/{user}', 'UserController@show');
+	Route::post('users', 'UserController@store');
+	Route::put('users/{user}', 'UserController@update');
+	Route::delete('users/{user}', 'UserController@destroy');
+	Route::get('users/{phone}/exists', 'UserController@exists');
+	
+	Route::get('bets', 'BetController@index');
+	Route::get('bets/{bet}', 'BetController@show');
+	Route::post('bets', 'BetController@store');
+	Route::put('bets/{bet}', 'BetController@update');
+	Route::delete('bets/{bet}', 'BetController@destroy');
+	Route::get('users/{user}/bets', 'BetController@bets');
+});

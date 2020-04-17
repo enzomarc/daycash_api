@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Bet;
 use App\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Crypt;
@@ -64,7 +65,7 @@ class AuthController extends Controller
 	{
 		try {
 			$connection = DB::table('connections')->where('token', $token)->first();
-			$connection->delete();
+			DB::table('connections')->delete($connection->id);
 
 			return response()->json(['message' => "Votre session a été fermée correctement."]);
 		} catch (\Exception $e) {
@@ -92,17 +93,31 @@ class AuthController extends Controller
 			
 			if (is_null($connected)) {
 				$connected = DB::table('connections')->where('token', $data['acc_token'])->first();
-				$connected->delete();
+				DB::table('connections')->delete($connected->id);
 				return response()->json(['message' => "Votre session a été fermée. Veuillez vous reconnecter."], 401);
 			}
 			
 			$clear_token = Crypt::decryptString($data['acc_token']);
 			$phone = explode('rand', $clear_token)[0];
 			
-			if ($phone == $connected->phone)
-				return response()->json('success', 200);
+			if ($phone == $connected->phone) {
+				$user = User::with(['bets'])->where('phone', $connected->phone)->first();
+				$actual_bet = DB::table('bets')
+					->where('user', $user->id)
+					->whereDate('created_at', '>=', date('Y-m-d'))
+					->first();
+				
+				if ($actual_bet != null) {
+					$actual_bet = Bet::find($actual_bet->id);
+					$actual_bet->remaining = $actual_bet->getRemaining();
+				}
+				
+				$user->actual_bet = $actual_bet;
+				
+				return response()->json(['user' => $user, 'token' => $data['acc_token']]);
+			}
 			else {
-				$connected->delete();
+				DB::table('connections')->delete($connected->id);
 				return response()->json(['message' => "Votre session a été fermée. Veuillez vous reconnecter."], 401);
 			}
 		} catch (\Exception $e) {

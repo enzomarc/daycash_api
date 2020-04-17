@@ -36,4 +36,5 @@ Route::group(['prefix' => 'api'], function () {
 	Route::put('bets/{bet}', 'BetController@update');
 	Route::delete('bets/{bet}', 'BetController@destroy');
 	Route::get('users/{user}/bets', 'BetController@bets');
+	Route::get('percents', 'BetController@percents');
 });

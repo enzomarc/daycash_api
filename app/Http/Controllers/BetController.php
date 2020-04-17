@@ -174,4 +174,37 @@ class BetController extends Controller
 			return response()->json(['message' => "Une erreur est survenue lors de l'obtention de vos mises.", 'exception' => $e->getMessage()], 500);
 		}
 	}
+	
+	/**
+	 * Get days winning percentages.
+	 *
+	 * @return \Illuminate\Http\JsonResponse
+	 */
+	public function percents()
+	{
+		try {
+			$monday = DB::table('bets')->whereDate('created_at', '>=', date('Y-m-d'))->where('day', 1)->count();
+			$tuesday = DB::table('bets')->whereDate('created_at', '>=', date('Y-m-d'))->where('day', 2)->count();
+			$wednesday = DB::table('bets')->whereDate('created_at', '>=', date('Y-m-d'))->where('day', 3)->count();
+			$thursday = DB::table('bets')->whereDate('created_at', '>=', date('Y-m-d'))->where('day', 4)->count();
+			$friday = DB::table('bets')->whereDate('created_at', '>=', date('Y-m-d'))->where('day', 5)->count();
+			$saturday = DB::table('bets')->whereDate('created_at', '>=', date('Y-m-d'))->where('day', 6)->count();
+			$sunday = DB::table('bets')->whereDate('created_at', '>=', date('Y-m-d'))->where('day', 7)->count();
+			$bets = DB::table('bets')->whereDate('created_at', '>=', date('Y-m-d'))->count();
+			
+			$arr = [
+				'1' => round(100 - ($monday * 100 / $bets), 2),
+				'2' => round(100 - ($tuesday * 100 / $bets), 2),
+				'3' => round(100 - ($wednesday * 100 / $bets), 2),
+				'4' => round(100 - ($thursday * 100 / $bets), 2),
+				'5' => round(100 - ($friday * 100 / $bets), 2),
+				'6' => round(100 - ($saturday * 100 / $bets), 2),
+				'7' => round(100 - ($sunday * 100 / $bets), 2),
+			];
+			
+			return response()->json(['percents' => $arr]);
+		} catch (\Exception $e) {
+			return response()->json(['message' => "Impossible d'obtenir les pourcentages de gains des jours."], 500);
+		}
+	}
 }
